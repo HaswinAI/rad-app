@@ -253,6 +253,26 @@
             font-size: 13px;
             margin-top: 8px;
         }
+        .machine-heading {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.3;
+      text-transform: uppercase;
+      margin: 10px auto;
+      padding: 0 10px;
+      background: linear-gradient(90deg, #ff9f2e, #fff, #ff9f2e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200%;
+      animation: glitter 3s linear infinite;
+    }
+    @keyframes glitter {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     </style>
 </head>
 
@@ -262,6 +282,16 @@
 
             <!-- ✅ SCREEN 1: PATIENT FORM -->
             <section id="scr-form" class="screen active">
+                <div style="display: flex; align-items: center;">
+                  <img src="logo1.jpg" width="20%" height="10%" style="margin-right: 10px;">
+                  <h3 class="machine-heading" style="margin: 0;">
+                    WORLD FIRST MULTISLICE PORTABLE CT <br>
+                    <center>LOW DOSE TECHNOLOGY</center>
+                  </h3>
+                </div>
+            </section>
+            <section id="scr-form" class="screen active">
+                <br><br><br><br><br>
                 <div class="title">PATIENT DETAILS</div>
                 <div class="group"><input id="f-name" class="input" placeholder="Patient Name" /></div>
                 <div class="group"><input id="f-uhid" class="input" placeholder="Patient UHID" /></div>
@@ -277,13 +307,20 @@
                 <div class="group">
                     <select id="f-dept" class="input">
                         <option disabled selected>Select Department</option>
-                        <option>Radiology</option>
-                        <option>Orthopedics</option>
-                        <option>General Medicine</option>
+                        <option>Critical Care</option>
+                        <option>Intensive Care Unit</option>
+                        <option>Surgery</option>
+                        <option>Others</option>
                     </select>
                 </div>
                 <div class="group"><textarea id="f-comments" rows="3" placeholder="COMMENTS : H/O"></textarea></div>
                 <button class="btn" onclick="goBody()">SUBMIT ✅</button>
+                <h3 class="machine-heading">
+                    <br><center>Powered By Deepak Scans</center>
+                  </h3>
+                  <br>
+                  <p class="hint">© Deepak Scan. All rights reserved 2025.</p>
+
             </section>
 
             <!-- ✅ SCREEN 2: BODY MODEL -->
@@ -296,7 +333,7 @@
                     <div id="legs-hotspot" class="hotspot" onclick="show('scr-protocols-limbs')"></div>
                     <div id="head-hotspot" class="hotspot" onclick="show('scr-protocols-brain')"></div>
                 </div>
-                <p class="hint">Tap head for Brain • Tap legs for Lower Limbs</p>
+                <p class="hint">© Deepak Scan. All rights reserved 2025.</p>
             </section>
 
             <!-- ✅ SCREEN 3A: LOWER LIMBS PROTOCOL -->
@@ -399,6 +436,7 @@
                     <h3>Anatomical reference</h3>
                     <p>Iliac crests to lesser trochanters incl. acetabulum and sacroiliac joints.</p>
                 </div>
+                <p class="hint">© Deepak Scan. All rights reserved 2025.</p>
             </section>
 
             <!-- ✅ SCREEN 4B: BRAIN – WITHOUT CONTRAST -->
@@ -424,8 +462,9 @@
                     </p>
                 </div>
 
-                <p class="hint">Scroll for full details. Use ← to go back.</p>
+                <p class="hint">© Deepak Scan. All rights reserved 2025.</p>
             </section>
+        
 
         </div>
     </div>
@@ -445,6 +484,7 @@
         }
         function toast(msg) { alert(msg); }
     </script>
+
 </body>
 
 </html>
