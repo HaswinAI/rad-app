@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Radiology Protocol App</title>
+    <style>
+        /* ---- THEME ---- */
+        :root {
+            --bg: #1d1b26;
+            --panel: #2b2836;
+            --card: #2f2c39;
+            --chip: #3a3746;
+            --text: #ffffff;
+            --muted: #cfcfd6;
+            --accent: #ff9f2e;
+            --accent-d: #e38d25;
+            --radius: 18px;
+        }
+
+        /* ---- BASE ---- */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: "Poppins", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .wrap {
+            display: grid;
+            place-items: center;
+            height: 100vh;
+        }
+
+        .phone {
+            width: min(420px, 94vw);
+            height: min(860px, 94vh);
+            background: var(--panel);
+            border-radius: 26px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, .55);
+        }
+
+        /* ---- SCREEN CONTAINER ---- */
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            overflow: auto;
+            padding: 24px 18px 28px;
+            box-sizing: border-box;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fade .25s ease;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        /* ---- UI TEXT ---- */
+        .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            margin: 6px 0 16px
+        }
+
+        .subhead {
+            text-align: center;
+            opacity: .9;
+            font-weight: 700;
+            margin: 6px 0 12px;
+            letter-spacing: 1px
+        }
+
+        /* ---- FORMS ---- */
+        .input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            outline: none;
+            background: var(--chip);
+            color: var(--text);
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .group {
+            margin: 10px 0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--accent-d);
+            color: #000;
+            font-weight: 700;
+            letter-spacing: .4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+        }
+
+        /* ---- BODY MODEL ---- */
+        .model-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 390px;
+            margin: auto;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .model {
+            width: 100%;
+            display: block;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* CLICKABLE HOTSPOTS */
+        .hotspot {
+            position: absolute;
+            cursor: pointer;
+        }
+
+        /* legs hotspot */
+        #legs-hotspot {
+            left: 25%;
+            top: 48%;
+            width: 50%;
+            height: 45%;
+        }
+
+        /* head hotspot */
+        #head-hotspot {
+            left: 33%;
+            top: 6%;
+            width: 34%;
+            height: 18%;
+        }
+
+        /* ---- LIST CARDS ---- */
+        .list {
+            display: grid;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .item {
+            background: #1f1d27;
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 17px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .chev {
+            font-size: 20px;
+            color: var(--accent)
+        }
+
+        /* ---- DETAIL PAGE ---- */
+        .back {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            border: none;
+            background: transparent;
+            color: var(--accent);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .hero {
+            width: 100%;
+            max-width: 360px;
+            margin: 8px auto 6px;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .hero img {
+            width: 100%;
+            display: block;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin: 12px 2px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .05);
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+            padding-bottom: 10px;
+        }
+
+        .card p {
+            margin: 6px 2px;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .hint {
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="phone">
+
+            <!-- ✅ SCREEN 1: PATIENT FORM -->
+            <section id="scr-form" class="screen active">
+                <div class="title">PATIENT DETAILS</div>
+                <div class="group"><input id="f-name" class="input" placeholder="Patient Name" /></div>
+                <div class="group"><input id="f-uhid" class="input" placeholder="Patient UHID" /></div>
+                <div class="group"><input id="f-age" type="number" class="input" placeholder="Patient Age" /></div>
+                <div class="group">
+                    <select id="f-gender" class="input">
+                        <option disabled selected>Select Gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="group">
+                    <select id="f-dept" class="input">
+                        <option disabled selected>Select Department</option>
+                        <option>Radiology</option>
+                        <option>Orthopedics</option>
+                        <option>General Medicine</option>
+                    </select>
+                </div>
+                <div class="group"><textarea id="f-comments" rows="3" placeholder="COMMENTS : H/O"></textarea></div>
+                <button class="btn" onclick="goBody()">SUBMIT ✅</button>
+            </section>
+
+            <!-- ✅ SCREEN 2: BODY MODEL -->
+            <section id="scr-body" class="screen">
+                <button class="back" onclick="show('scr-form')">←</button>
+                <div class="title">CHOOSE WHAT YOU WANT TO STUDY</div>
+
+                <div class="model-wrap">
+                    <img class="model" src="first.jpg" />
+                    <div id="legs-hotspot" class="hotspot" onclick="show('scr-protocols-limbs')"></div>
+                    <div id="head-hotspot" class="hotspot" onclick="show('scr-protocols-brain')"></div>
+                </div>
+                <p class="hint">Tap head for Brain • Tap legs for Lower Limbs</p>
+            </section>
+
+            <!-- ✅ SCREEN 3A: LOWER LIMBS PROTOCOL -->
+            <section id="scr-protocols-limbs" class="screen">
+                <button class="back" onclick="show('scr-body')">←</button>
+                <div class="title">PROTOCOLS</div>
+                <div class="subhead">LOWER LIMBS</div>
+                <div class="list">
+                    <div class="item" onclick="show('scr-pelvis')">
+                        <div class="row"><span class="dot"></span>Pelvis</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="toast('Knee page coming soon')">
+                        <div class="row"><span class="dot"></span>Knee</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="toast('Ankle page coming soon')">
+                        <div class="row"><span class="dot"></span>Ankle</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="toast('Foot page coming soon')">
+                        <div class="row"><span class="dot"></span>Foot</div><span class="chev">›</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ✅ SCREEN 3B: BRAIN PROTOCOL -->
+            <section id="scr-protocols-brain" class="screen">
+                <button class="back" onclick="show('scr-body')">←</button>
+                <div class="title">PROTOCOLS</div>
+            
+                <!-- BRAIN -->
+                <div class="subhead">BRAIN</div>
+                <div class="list">
+                    <div class="item" onclick="show('scr-brain-nc')">
+                        <div class="row"><span class="dot"></span>Without contrast</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="show('scr-brain-contrast')">
+                        <div class="row"><span class="dot"></span>With contrast</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="show('scr-brain-angio')">
+                        <div class="row"><span class="dot"></span>Angio CT</div><span class="chev">›</span>
+                    </div>
+                </div>
+            
+                <!-- FACIAL SKELETON -->
+                <div class="subhead">FACIAL SKELETON</div>
+                <div class="list">
+                    <div class="item" onclick="show('scr-facial')">
+                        <div class="row"><span class="dot"></span>Facial skeleton</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="show('scr-sinuses')">
+                        <div class="row"><span class="dot"></span>Sinuses</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="show('scr-orbits')">
+                        <div class="row"><span class="dot"></span>Orbits</div><span class="chev">›</span>
+                    </div>
+                </div>
+            
+                <!-- EAR AND PEÑASCO -->
+                <div class="subhead">EAR AND PEÑASCO</div>
+                <div class="list">
+                    <div class="item" onclick="show('scr-ear')">
+                        <div class="row"><span class="dot"></span>Ear and peñasco</div><span class="chev">›</span>
+                    </div>
+                </div>
+            
+                <!-- NECK - CERVICAL SPINE -->
+                <div class="subhead">NECK - CERVICAL SPINE</div>
+                <div class="list">
+                    <div class="item" onclick="show('scr-neck')">
+                        <div class="row"><span class="dot"></span>Neck</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="show('scr-neck-angio')">
+                        <div class="row"><span class="dot"></span>Angio CT</div><span class="chev">›</span>
+                    </div>
+                    <div class="item" onclick="show('scr-cspine')">
+                        <div class="row"><span class="dot"></span>Cervical Spine</div><span class="chev">›</span>
+                    </div>
+                </div>
+            </section>
+            
+
+            <!-- ✅ SCREEN 4A: PELVIS DETAILS -->
+            <section id="scr-pelvis" class="screen">
+                <button class="back" onclick="show('scr-protocols-limbs')">←</button>
+                <div class="title">PELVIS</div>
+                <div class="hero"><img src="https://i.imgur.com/9s6xqI3.png"></div>
+                <div class="card">
+                    <h3>Indications</h3>
+                    <p>Inflammatory joint pathology, avascular necrosis, femoral neck version angle analysis, tumors,
+                        degenerative disease, etc.</p>
+                </div>
+                <div class="card">
+                    <h3>Previous preparation</h3>
+                    <p>Remove metallic objects from abdomen and pelvis.</p>
+                </div>
+                <div class="card">
+                    <h3>Patient position</h3>
+                    <p>Dorsal decubitus, arms up, feet internal rotation.</p>
+                </div>
+                <div class="card">
+                    <h3>Anatomical reference</h3>
+                    <p>Iliac crests to lesser trochanters incl. acetabulum and sacroiliac joints.</p>
+                </div>
+            </section>
+
+            <!-- ✅ SCREEN 4B: BRAIN – WITHOUT CONTRAST -->
+            <section id="scr-brain-nc" class="screen">
+                <button class="back" onclick="show('scr-protocols-brain')">←</button>
+                <div class="title">WITHOUT CONTRAST</div>
+                <div class="hero"><img src="image.png"></div>
+
+                <div class="card">
+                    <h3>Indications</h3>
+                    <p>Head trauma, headaches, stroke, subarachnoid hemorrhage, suspected hydrocephalus, abnormal valve
+                        function, loss of consciousness, motility/sensory loss.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Previous preparation</h3>
+                    <p>Remove all metallic objects from the patient's head, face and neck.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Patient position</h3>
+                    <p>Dorsal decubitus, chin close to chest, head toward gantry, use foam supports for immobilization.
+                    </p>
+                </div>
+
+                <p class="hint">Scroll for full details. Use ← to go back.</p>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        function show(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+        function goBody() {
+            const req = ["f-name", "f-uhid", "f-age", "f-gender", "f-dept"];
+            for (const id of req) {
+                const el = document.getElementById(id);
+                if (!el.value) { alert("Please fill all required fields."); el.focus(); return; }
+            }
+            show('scr-body');
+        }
+        function toast(msg) { alert(msg); }
+    </script>
+</body>
+
+</html>
