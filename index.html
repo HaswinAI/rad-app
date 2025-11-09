@@ -272,6 +272,9 @@
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
+    #exposed-status {
+  white-space: pre-line;
+    }
 
     </style>
 </head>
@@ -485,13 +488,13 @@
     <div class="card">
       <h3 style="color:#ff4d4d;">⚠️ Safety Warning</h3>
       <p>
-        Make sure all individuals are standing away from the scan field. 
-        Do not place any metallic objects near the patient. Use radiation protection shields whenever possible.
+        Make sure all individuals are standing away from the scan field.<br>
+        Use radiation protection shields.
       </p>
     </div>
   
     <div style="text-align:center; margin-top:20px;">
-      <button class="btn" id="expose-btn" onclick="toggleExposure()">Expose 🔔</button>
+      <button class="btn" id="expose-btn" onclick="toggleExposure()">Expose ☢</button>
     </div>
   
     <p class="hint" id="exposed-status" style="font-size:16px; font-weight:600; margin-top:15px;">
@@ -535,15 +538,15 @@
 
     if (!isExposing) {
         alarm.play();
-        button.textContent = "Stop Alarm 🔕";
-        status.textContent = "🔴 Exposing... Please stand clear";
+        button.textContent = "☢ ☢ ☢ ☢ ☢ ☢";
+        status.textContent = "🔴 Exposing... Please stand away with radiation protection.";
         status.style.color = "#ff4d4d";
         isExposing = true;
     } else {
         alarm.pause();
         alarm.currentTime = 0;
-        button.textContent = "Expose 🔔";
-        status.textContent = "✅ Exposure Complete";
+        button.textContent = "Expose ☢";
+        status.textContent = "✅ Exposure Complete.\n\nThe protocol image Will be transferred to nearby connected DICOM DEVICE";
         status.style.color = "#4dff7a";
         isExposing = false;
     }
