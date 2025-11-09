@@ -462,9 +462,52 @@
                     </p>
                 </div>
 
+                <div style="text-align:center; margin-top:20px;">
+                    <button class="btn" onclick="show('scr-expose')">OK ✅</button>
+                  </div>
+                  
+
                 <p class="hint">© Deepak Scan. All rights reserved 2025.</p>
             </section>
-        
+            
+            <!-- ✅ SCREEN 5: EXPOSURE CONTROL -->
+<section id="scr-expose" class="screen">
+    <button class="back" onclick="show('scr-brain-nc')">←</button>
+    <div class="title">EXPOSURE CONTROL</div>
+  
+    <div class="card" style="text-align:center;">
+      <h3>Portable Multiscan</h3>
+      <p style="font-size: 16px; font-weight:600; color: var(--accent);">
+        ✅ Ready to Expose
+      </p>
+    </div>
+  
+    <div class="card">
+      <h3 style="color:#ff4d4d;">⚠️ Safety Warning</h3>
+      <p>
+        Make sure all individuals are standing away from the scan field. 
+        Do not place any metallic objects near the patient. Use radiation protection shields whenever possible.
+      </p>
+    </div>
+  
+    <div style="text-align:center; margin-top:20px;">
+      <button class="btn" id="expose-btn" onclick="toggleExposure()">Expose 🔔</button>
+    </div>
+  
+    <p class="hint" id="exposed-status" style="font-size:16px; font-weight:600; margin-top:15px;">
+      <!-- State will update here -->
+    </p>
+  
+    <!-- Alarm Audio -->
+    <audio id="alarm-sound" loop>
+        <source src="audio.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+      
+  
+    <p class="hint">© Deepak Scan. All rights reserved 2025.</p>
+  </section>
+  
 
         </div>
     </div>
@@ -483,6 +526,29 @@
             show('scr-body');
         }
         function toast(msg) { alert(msg); }
+
+        let isExposing = false;
+    function toggleExposure() {
+    const alarm = document.getElementById("alarm-sound");
+    const button = document.getElementById("expose-btn");
+    const status = document.getElementById("exposed-status");
+
+    if (!isExposing) {
+        alarm.play();
+        button.textContent = "Stop Alarm 🔕";
+        status.textContent = "🔴 Exposing... Please stand clear";
+        status.style.color = "#ff4d4d";
+        isExposing = true;
+    } else {
+        alarm.pause();
+        alarm.currentTime = 0;
+        button.textContent = "Expose 🔔";
+        status.textContent = "✅ Exposure Complete";
+        status.style.color = "#4dff7a";
+        isExposing = false;
+    }
+    }
+
     </script>
 
 </body>

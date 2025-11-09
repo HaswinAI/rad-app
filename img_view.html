@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CT Viewer (Light, Responsive)</title>
+<style>
+  :root{
+    --bg:#f7f7f7;
+    --panel:#ffffff;
+    --ink:#111;
+    --muted:#666;
+    --accent:#1a73e8;
+    --border:#e6e6e6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    height:100dvh;
+    overflow:hidden; /* keep the viewer fixed and prevent page scroll */
+  }
+
+  /* Header */
+  .topbar{
+    height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+  }
+  .brand{
+    font-weight:600;
+    letter-spacing:.2px;
+  }
+  .status{
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  /* Layout */
+  .wrap{
+    display:flex;
+    height:calc(100dvh - 56px);
+    width:100%;
+  }
+
+  /* Thumbnails (desktop = left vertical) */
+  .thumbs{
+    width:160px;
+    min-width:140px;
+    max-width:200px;
+    background:var(--panel);
+    border-right:1px solid var(--border);
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:10px;
+  }
+  .thumbs-grid{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .thumb{
+    width:100%;
+    display:block;
+    border:2px solid transparent;
+    border-radius:6px;
+    cursor:pointer;
+    transition:border-color .15s ease, transform .05s ease;
+    background:#fafafa;
+  }
+  .thumb:hover{ border-color:#cbd5e1; }
+  .thumb.active{ border-color:var(--accent); }
+  .thumb:active{ transform:scale(.98); }
+
+  /* Viewer */
+  .viewer{
+    position:relative;
+    flex:1;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #mainImage{
+    max-width:96%;
+    max-height:92%;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#fff;
+  }
+  /* On-screen hint */
+  .hint{
+    position:absolute;
+    bottom:14px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:12px;
+    color:#777;
+    background:rgba(255,255,255,.9);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:6px 10px;
+    backdrop-filter:saturate(1.2) blur(2px);
+    white-space:nowrap;
+  }
+
+  /* Mobile / small screens: thumbnails go to bottom as horizontal strip */
+  @media (max-width: 768px){
+    .wrap{
+      flex-direction:column;
+    }
+    .thumbs{
+      order:2;
+      width:100%;
+      height:120px;
+      max-height:33vh;
+      border-right:none;
+      border-top:1px solid var(--border);
+      padding:10px;
+      overflow-x:auto;
+      overflow-y:hidden;
+    }
+    .thumbs-grid{
+      flex-direction:row;
+      gap:10px;
+      height:100%;
+    }
+    .thumb{
+      height:100%;
+      width:auto;
+      aspect-ratio:1/1;
+      object-fit:cover;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">CT Brain Viewer</div>
+    <div class="status" id="status">Slice 1 / 60</div>
+  </header>
+
+  <main class="wrap">
+    <!-- Thumbnails -->
+    <aside class="thumbs" id="thumbs">
+      <div class="thumbs-grid" id="thumbGrid"></div>
+    </aside>
+
+    <!-- Main viewer -->
+    <section class="viewer" id="viewer">
+      <img id="mainImage" src="images/1.jpg" alt="CT slice">
+      <div class="hint" id="hint">Scroll / Swipe to change slice</div>
+    </section>
+  </main>
+
+<script>
+(function(){
+  const TOTAL = 60;                   // number of images
+  const EXT = 'jpg';                  // confirmed by you
+  const mainImage = document.getElementById('mainImage');
+  const statusEl  = document.getElementById('status');
+  const grid      = document.getElementById('thumbGrid');
+  const viewer    = document.getElementById('viewer');
+  const hint      = document.getElementById('hint');
+
+  let index = 1; // 1..TOTAL
+
+  // Build thumbnails dynamically
+  for(let i=1;i<=TOTAL;i++){
+    const t = document.createElement('img');
+    t.src = `images/${i}.${EXT}`;
+    t.alt = `Slice ${i}`;
+    t.className = 'thumb';
+    t.dataset.index = i;
+    t.addEventListener('click', () => goTo(i));
+    grid.appendChild(t);
+  }
+
+  // Initial highlight
+  highlight(index);
+  updateStatus();
+
+  // Core navigation
+  function goTo(n){
+    if(n < 1) n = 1;
+    if(n > TOTAL) n = TOTAL;
+    if(n === index) return;
+    index = n;
+    mainImage.src = `images/${index}.${EXT}`;
+    highlight(index);
+    updateStatus();
+  }
+
+  function step(delta){
+    goTo(index + delta);
+  }
+
+  function highlight(n){
+    document.querySelectorAll('.thumb').forEach(el => el.classList.remove('active'));
+    const active = document.querySelector(`.thumb[data-index="${n}"]`);
+    if(active){
+      active.classList.add('active');
+      // Ensure active thumb is visible in its scroll container
+      active.scrollIntoView({ inline:'center', block:'nearest', behavior:'smooth' });
+    }
+  }
+
+  function updateStatus(){
+    statusEl.textContent = `Slice ${index} / ${TOTAL}`;
+  }
+
+  // Mouse wheel over viewer to change slice
+  viewer.addEventListener('wheel', (e) => {
+    e.preventDefault(); // keep the page from scrolling
+    const dir = e.deltaY > 0 ? 1 : -1;
+    step(dir);
+  }, { passive:false });
+
+  // Keyboard arrows
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') step(1);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') step(-1);
+    else if (e.key === 'Home') goTo(1);
+    else if (e.key === 'End') goTo(TOTAL);
+  });
+
+  // Touch swipe on the viewer
+  let touchStartX = 0, touchStartY = 0, swiping = false;
+  const SWIPE_PX = 30;
+
+  viewer.addEventListener('touchstart', (e)=>{
+    if(!e.touches || e.touches.length===0) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    swiping = true;
+  }, {passive:true});
+
+  viewer.addEventListener('touchmove', (e)=>{
+    if(!swiping) return;
+    // If horizontal movement dominates, prevent page scroll
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy)) e.preventDefault();
+  }, {passive:false});
+
+  viewer.addEventListener('touchend', (e)=>{
+    if(!swiping) return;
+    const touch = e.changedTouches && e.changedTouches[0];
+    if(!touch) return;
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_PX){
+      // swipe right -> previous (lower index), swipe left -> next
+      if (dx > 0) step(-1); else step(1);
+    }
+    swiping = false;
+  }, {passive:true});
+
+  // Hide hint after first interaction
+  ['wheel','keydown','touchend','click'].forEach(ev=>{
+    window.addEventListener(ev, ()=>{ if(hint) hint.style.display='none'; }, {once:true});
+  });
+
+  // Optional: prefetch the next/prev images for smoother viewing
+  function prefetchAround(n){
+    [n+1, n-1].forEach(k=>{
+      if(k>=1 && k<=TOTAL){
+        const img = new Image();
+        img.src = `images/${k}.${EXT}`;
+      }
+    });
+  }
+  mainImage.addEventListener('load', ()=>prefetchAround(index));
+  prefetchAround(index);
+
+  // If any image is missing, fail gracefully but keep index/state
+  mainImage.addEventListener('error', ()=>{
+    // Show a simple placeholder border (already present) and keep status
+    console.warn(`Missing image: images/${index}.${EXT}`);
+  });
+})();
+</script>
+</body>
+</html>
